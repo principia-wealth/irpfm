@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora IRPF-M | CDB vs LCA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #374151;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            ring: 2px solid #bfdbfe;
+        }
+
+        .table-custom {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .table-custom th, .table-custom td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table-custom th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+
+        .row-highlight {
+            background-color: #f0f7ff;
+            font-weight: 700;
+        }
+
+        .highlight-green { color: #059669; }
+        .highlight-red { color: #dc2626; }
+
+        .bar-container {
+            height: 40px;
+            background: #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .bar-fill {
+            height: 100%;
+            transition: width 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            padding-left: 12px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .badge-best {
+            background: #059669;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Calculadora IRPF-M</h1>
+            <p class="text-gray-600">Comparativo: CDB (tributado) vs LCA (isento) + Dividendos</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- COLUNA DE PREMISSAS -->
+            <div class="lg:col-span-1">
+                <div class="card">
+                    <h2 class="text-xl font-bold mb-4 border-bottom pb-2">Premissas</h2>
+                    
+                    <div class="space-y-4">
+                        <div class="input-group">
+                            <label>Capital Investido (R$)</label>
+                            <input type="text" id="inputCapital" placeholder="10.000.000" oninput="calculate()">
+                        </div>
+                        <div class="input-group">
+                            <label>Dividendos/ano (R$)</label>
+                            <input type="text" id="inputDividendos" placeholder="5.000.000" oninput="calculate()">
+                        </div>
+                        <div class="input-group">
+                            <label>CDI (% a.a.)</label>
+                            <input type="text" id="inputCDI" placeholder="14,40" oninput="calculate()">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="input-group">
+                                <label>CDB (% do CDI)</label>
+                                <input type="text" id="inputCDBPerc" placeholder="105" oninput="calculate()">
+                                <p id="hintCDB" class="text-xs text-blue-600 mt-1"></p>
+                            </div>
+                            <div class="input-group">
+                                <label>LCA (% do CDI)</label>
+                                <input type="text" id="inputLCAPerc" placeholder="89" oninput="calculate()">
+                                <p id="hintLCA" class="text-xs text-blue-600 mt-1"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-4 border-t border-gray-100 text-xs text-gray-500">
+                        <strong>Constantes Tributárias:</strong><br>
+                        IRRF CDB: 15% | IRRF Div: 10% | IRPF-M: 10%
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUNA DE RESULTADOS -->
+            <div class="lg:col-span-2 space-y-8">
+                
+                <!-- BANNER DE RESULTADO -->
+                <div id="resultBanner" class="card text-center border-l-8 border-green-500 hidden">
+                    <h2 id="bannerTitle" class="text-2xl font-bold mb-1">CDB deixa R$ 0 a mais no bolso</h2>
+                    <p id="bannerDiff" class="text-gray-600 mb-2 font-medium">Diferença de 0% no resultado final</p>
+                    <span id="bestOptionBadge" class="badge-best">Melhor Opção: CDB</span>
+                </div>
+
+                <!-- GRÁFICO SIMPLES -->
+                <div class="card">
+                    <h2 class="text-lg font-bold mb-6">Comparativo Líquido "No Bolso"</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm font-semibold">Cenário A: 100% Tributados (CDB)</span>
+                                <span id="labelBarCDB" class="text-sm font-bold">R$ 0,00</span>
+                            </div>
+                            <div class="bar-container">
+                                <div id="barCDB" class="bar-fill bg-blue-600" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm font-semibold">Cenário B: 100% Isentos (LCA)</span>
+                                <span id="labelBarLCA" class="text-sm font-bold">R$ 0,00</span>
+                            </div>
+                            <div class="bar-container">
+                                <div id="barLCA" class="bar-fill bg-emerald-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DETALHAMENTO -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Detalhe CDB -->
+                    <div class="card">
+                        <h3 class="font-bold text-blue-700 mb-3 uppercase tracking-wider text-sm">Detalhamento Cenário A (CDB)</h3>
+                        <div id="detailsCDB" class="text-sm space-y-2"></div>
+                    </div>
+                    <!-- Detalhe LCA -->
+                    <div class="card">
+                        <h3 class="font-bold text-emerald-700 mb-3 uppercase tracking-wider text-sm">Detalhamento Cenário B (LCA)</h3>
+                        <div id="detailsLCA" class="text-sm space-y-2"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONSTANTES TRIBUTÁRIAS ---
+        const ALIQ_IRRF_CDB = 0.15;
+        const ALIQ_IRRF_DIV = 0.10;
+        const ALIQ_IRPFM = 0.10;
+
+        // --- FUNÇÕES DE UTILIDADE ---
+        function parseInput(id, defaultValue) {
+            let val = document.getElementById(id).value;
+            if (!val) return defaultValue;
+            // Converte padrão brasileiro (vírgula) para americano (ponto)
+            val = val.replace(/\./g, '').replace(',', '.');
+            let num = parseFloat(val);
+            return isNaN(num) || num < 0 ? defaultValue : num;
+        }
+
+        function formatBRL(value) {
+            return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function formatPerc(value) {
+            return (value * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+        }
+
+        // --- MOTOR DE CÁLCULO ---
+        function calculateScenario(isLCA, P, D, cdiDecimal, prodPercCDI) {
+            const taxaAnualBruta = cdiDecimal * (prodPercCDI / 100);
+            const rendimentoBruto = P * taxaAnualBruta;
+
+            let irrfAplicacoes = 0;
+            if (!isLCA) {
+                irrfAplicacoes = rendimentoBruto * ALIQ_IRRF_CDB;
+            }
+
+            const liquidoAplicacoes = rendimentoBruto - irrfAplicacoes;
+
+            // Dividendos
+            const irrfDividendos = D * ALIQ_IRRF_DIV;
+            const dividendosLiquido = D - irrfDividendos;
+
+            // IRPF-M
+            const baseIRPFM = isLCA ? D : (rendimentoBruto + D);
+            const irpfmBruto = baseIRPFM * ALIQ_IRPFM;
+
+            // Lógica de compensação (Ordem de consumo)
+            const creditoAplicacoes = irrfAplicacoes;
+            const creditoDividendos = irrfDividendos;
+
+            const irrfAplicUsado = Math.min(creditoAplicacoes, irpfmBruto);
+            const saldoParaCobrir = irpfmBruto - irrfAplicUsado;
+            const irrfDivUsado = Math.min(creditoDividendos, saldoParaCobrir);
+
+            const irpfmAPagar = Math.max(0, irpfmBruto - (irrfAplicUsado + irrfDivUsado));
+            const irrfDivRestituir = Math.max(0, creditoDividendos - irrfDivUsado);
+
+            // Final "NO BOLSO"
+            const noBolso = liquidoAplicacoes + dividendosLiquido - irpfmAPagar + irrfDivRestituir;
+
+            return {
+                taxaAnualBruta,
+                rendimentoBruto,
+                irrfAplicacoes,
+                liquidoAplicacoes,
+                irrfDividendos,
+                dividendosLiquido,
+                baseIRPFM,
+                irpfmBruto,
+                irrfAplicUsado,
+                irrfDivUsado,
+                irpfmAPagar,
+                irrfDivRestituir,
+                noBolso
+            };
+        }
+
+        function renderTable(containerId, data, isLCA) {
+            const html = `
+                <table class="table-custom">
+                    <tr><td>Rendimento Bruto</td><td class="text-right">${formatBRL(data.rendimentoBruto)}</td></tr>
+                    ${!isLCA ? `<tr><td>(-) IRRF 15%</td><td class="text-right highlight-red">-${formatBRL(data.irrfAplicacoes)}</td></tr>` : '<tr><td>Isento</td><td class="text-right highlight-green">R$ 0,00</td></tr>'}
+                    <tr class="font-semibold"><td>Líquido Aplicação</td><td class="text-right">${formatBRL(data.liquidoAplicacoes)}</td></tr>
+                    <tr class="bg-gray-50"><td colspan="2" class="py-1 text-[10px] text-gray-400">DIVIDENDOS</td></tr>
+                    <tr><td>Dividendos Bruto</td><td class="text-right">${formatBRL(data.irrfDividendos + data.dividendosLiquido)}</td></tr>
+                    <tr><td>(-) IRRF Div 10%</td><td class="text-right">-${formatBRL(data.irrfDividendos)}</td></tr>
+                    <tr class="bg-gray-50"><td colspan="2" class="py-1 text-[10px] text-gray-400">BLOCO IRPF-M (MÍNIMO)</td></tr>
+                    <tr><td>Base IRPF-M</td><td class="text-right">${formatBRL(data.baseIRPFM)}</td></tr>
+                    <tr><td>IRPF-M Bruto (10%)</td><td class="text-right">${formatBRL(data.irpfmBruto)}</td></tr>
+                    <tr class="text-xs italic"><td>(-) IRRF Aplic. Usado</td><td class="text-right">-${formatBRL(data.irrfAplicUsado)}</td></tr>
+                    <tr class="text-xs italic"><td>(-) IRRF Div. Usado</td><td class="text-right">-${formatBRL(data.irrfDivUsado)}</td></tr>
+                    <tr><td>IRPF-M a Pagar</td><td class="text-right font-bold text-red-600">${formatBRL(data.irpfmAPagar)}</td></tr>
+                    <tr><td>IRRF Div. a Restituir</td><td class="text-right font-bold text-green-600">${formatBRL(data.irrfDivRestituir)}</td></tr>
+                    <tr class="row-highlight">
+                        <td>VALOR NO BOLSO</td>
+                        <td class="text-right text-blue-800 text-base">${formatBRL(data.noBolso)}</td>
+                    </tr>
+                </table>
+            `;
+            document.getElementById(containerId).innerHTML = html;
+        }
+
+        function calculate() {
+            // 1. Inputs com defaults
+            const P = parseInput('inputCapital', 10000000);
+            const D = parseInput('inputDividendos', 5000000);
+            const cdi = parseInput('inputCDI', 14.40);
+            const cdbPerc = parseInput('inputCDBPerc', 105);
+            const lcaPerc = parseInput('inputLCAPerc', 89);
+
+            const cdiDecimal = cdi / 100;
+
+            // 2. Cálculos
+            const resCDB = calculateScenario(false, P, D, cdiDecimal, cdbPerc);
+            const resLCA = calculateScenario(true, P, D, cdiDecimal, lcaPerc);
+
+            // 3. UI - Hints de taxas
+            document.getElementById('hintCDB').innerText = `= ${formatPerc(resCDB.taxaAnualBruta)} bruto`;
+            document.getElementById('hintLCA').innerText = `= ${formatPerc(resLCA.taxaAnualBruta)} líquido`;
+
+            // 4. Tabelas
+            renderTable('detailsCDB', resCDB, false);
+            renderTable('detailsLCA', resLCA, true);
+
+            // 5. Gráfico e Banners
+            const maxVal = Math.max(resCDB.noBolso, resLCA.noBolso);
+            const percCDB = (resCDB.noBolso / maxVal) * 100;
+            const percLCA = (resLCA.noBolso / maxVal) * 100;
+
+            document.getElementById('barCDB').style.width = percCDB + '%';
+            document.getElementById('barLCA').style.width = percLCA + '%';
+            document.getElementById('labelBarCDB').innerText = formatBRL(resCDB.noBolso);
+            document.getElementById('labelBarLCA').innerText = formatBRL(resLCA.noBolso);
+
+            // 6. Diferença e Melhor Opção
+            const diff = resCDB.noBolso - resLCA.noBolso;
+            const banner = document.getElementById('resultBanner');
+            banner.classList.remove('hidden');
+
+            const bannerTitle = document.getElementById('bannerTitle');
+            const bannerDiff = document.getElementById('bannerDiff');
+            const badge = document.getElementById('bestOptionBadge');
+
+            if (diff > 0.01) {
+                bannerTitle.innerText = `CDB deixa ${formatBRL(diff)} a mais no bolso`;
+                badge.innerText = "Melhor Opção: CDB";
+                badge.className = "badge-best bg-blue-600";
+                banner.className = "card text-center border-l-8 border-blue-600";
+            } else if (diff < -0.01) {
+                bannerTitle.innerText = `LCA deixa ${formatBRL(Math.abs(diff))} a mais no bolso`;
+                badge.innerText = "Melhor Opção: LCA";
+                badge.className = "badge-best bg-emerald-600";
+                banner.className = "card text-center border-l-8 border-emerald-600";
+            } else {
+                bannerTitle.innerText = "Empate: mesmo resultado no bolso";
+                badge.innerText = "Empate Técnico";
+                badge.className = "badge-best bg-gray-500";
+                banner.className = "card text-center border-l-8 border-gray-500";
+            }
+
+            const percDiff = Math.abs(diff) / resLCA.noBolso;
+            bannerDiff.innerText = `Diferença de ${formatPerc(percDiff)} no resultado final`;
+        }
+
+        // Inicializar
+        window.onload = calculate;
+    </script>
+</body>
+</html>
