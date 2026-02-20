@@ -74,7 +74,7 @@
       text-transform: uppercase;
     }
 
-    /* Garantia de ausência de itálico em todo o documento */
+    /* Removendo itálicos de todo o documento */
     * {
       font-style: normal !important;
     }
@@ -160,7 +160,7 @@
           </section>
 
           <section class="p-5 bg-white border border-slate-200 rounded-xl">
-              <h3 class="text-[10px] font-bold uppercase text-slate-400 mb-2">Premissas importantes</h3>
+              <h3 class="text-[10px] font-bold uppercase text-slate-400 mb-2 font-bold">Premissas importantes</h3>
               <p class="text-[11px] text-slate-500 leading-relaxed text-justify">
                 Dividendos distribuídos de forma uniforme ao longo dos meses, retenções na fonte conforme as regras vigentes, alíquota de IR considerada para o investimento tributado de 15%, cálculo do ajuste apenas no âmbito do Imposto de Renda anual (DAA) e análise isolada do portfólio, sem considerar outras rendas, deduções ou particularidades fiscais individuais.
               </p>
@@ -240,7 +240,7 @@
   <script>
     const ALIQ_IR_CDB = 0.15;
     const ALIQ_IRRF_DIV = 0.10;
-    const ISENCAO_DIV_MENSAL = 50000;
+    const LIMITE_DIV_ANUAL = 600000; // 50.000 * 12
     
     const THRESHOLD_MIN = 600000;
     const THRESHOLD_MAX = 1200000;
@@ -273,18 +273,23 @@
       const irFonteProduto = isIsento ? 0 : (rendBruto * ALIQ_IR_CDB);
       const rendLiqProduto = rendBruto - irFonteProduto;
       
-      const mediaMensal = dividendos / 12;
-      const excedenteMensal = Math.max(0, mediaMensal - ISENCAO_DIV_MENSAL);
-      const irFonteDiv = excedenteMensal * ALIQ_IRRF_DIV * 12;
+      // REGRA DIVIDENDOS: Se total anual > 600k, aplica 10% sobre o todo. Caso contrário, zero.
+      const irFonteDiv = dividendos > LIMITE_DIV_ANUAL ? (dividendos * ALIQ_IRRF_DIV) : 0;
       const divLiq = dividendos - irFonteDiv;
 
+      // BASE DE CÁLCULO PARA IRPF-M
+      // Para LCA, lucro do título não compõe base.
       const baseIrpfM = isIsento ? dividendos : (rendBruto + dividendos);
 
       const aliquotaEfetiva = calculateAliquot(baseIrpfM);
       const impostoDevidoTotal = baseIrpfM * aliquotaEfetiva;
       
       const totalIrRetido = irFonteProduto + irFonteDiv;
+      
+      // Saldo do IRPF-M (Ajuste na DAA): Retenções menos Devido teórico
       const ajusteDAA = totalIrRetido - impostoDevidoTotal;
+      
+      // PATRIMÔNIO LÍQUIDO FINAL
       const patrimonioFinal = capital + rendLiqProduto + divLiq + ajusteDAA;
 
       return {
