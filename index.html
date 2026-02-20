@@ -74,8 +74,8 @@
       text-transform: uppercase;
     }
 
-    /* Garantir que nada fique em itálico */
-    em, i, strong, b, span, p, h1, h2, h3, h4, th, td {
+    /* Garantia de ausência de itálico em todo o documento */
+    * {
       font-style: normal !important;
     }
   </style>
@@ -89,15 +89,12 @@
         <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-lg">
           <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </div>
-        <h1 class="text-2xl font-black tracking-tight text-slate-900 uppercase">Simulador de IRPF-M | <span class="text-slate-500 font-light">Principia Wealth</span></h1>
+        <h1 class="text-2xl font-black tracking-tight text-slate-900 uppercase">Simulador de IRPF-M | <span class="text-slate-500 font-light font-normal">Principia Wealth</span></h1>
       </div>
       
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+      <div class="max-w-4xl">
         <p class="text-slate-500 text-sm leading-relaxed text-justify">
-          <strong>O que é:</strong> Uma ferramenta de análise técnica para investidores avaliarem a carga tributária final sobre o patrimônio, confrontando o rendimento de ativos tributados e isentos sob a nova regra de alíquota mínima progressiva.
-        </p>
-        <p class="text-slate-500 text-sm leading-relaxed border-l-2 border-slate-200 pl-4 text-justify">
-          <strong>Para que serve:</strong> O simulador projeta o saldo de ajuste do IRPF-M, calculando se o imposto já retido na fonte é suficiente para cobrir o imposto mínimo devido (0% a 10%) sobre a base bruta de rendimentos tributáveis e dividendos.
+          Este simulador mostra como a nova regra de imposto mínimo para altas rendas pode impactar o resultado real do seu portfólio, comparando ativos tributados e isentos sob a ótica da renda total anual. Ao considerar os impostos já retidos ao longo do ano e o possível ajuste no Imposto de Renda, ele permite visualizar com mais precisão o patrimônio líquido final — evitando decisões baseadas apenas na “isenção” nominal de determinados investimentos.
         </p>
       </div>
     </header>
@@ -111,18 +108,18 @@
           
           <div class="space-y-4">
             <div>
-              <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Patrimônio no Título (R$)</label>
+              <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Capital Investido (R$)</label>
               <input type="text" id="inputCapital" class="input-field mono" value="10.000.000,00">
             </div>
 
             <div>
               <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Dividendos Recebidos (Anual)</label>
-              <input type="text" id="inputDividendos" class="input-field mono" value="5.000.000,00">
+              <input type="text" id="inputDividendos" class="input-field mono" value="1.000.000,00">
             </div>
 
             <div>
               <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">CDI Alvo (% a.a.)</label>
-              <input type="text" id="inputCDI" class="input-field mono" value="10,00">
+              <input type="text" id="inputCDI" class="input-field mono" value="12,00">
             </div>
 
             <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100 mt-4">
@@ -131,30 +128,44 @@
                 <input type="text" id="inputCDBPerc" class="input-field py-1 text-sm mono" value="105">
               </div>
               <div>
-                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">LCA (% CDI)</label>
+                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">LCA/LCI (% CDI)</label>
                 <input type="text" id="inputLCAPerc" class="input-field py-1 text-sm mono" value="90">
               </div>
             </div>
           </div>
         </section>
 
-        <section class="p-5 bg-slate-100 border border-slate-200 rounded-xl">
-            <h3 class="text-[10px] font-bold uppercase text-slate-600 mb-2">Parâmetros de Alíquota</h3>
-            <div class="space-y-2 text-[11px] text-slate-600 leading-normal">
-                <div class="flex justify-between border-b border-slate-200 pb-1">
-                    <span>Base até R$ 600.000</span>
-                    <span class="font-bold">0%</span>
-                </div>
-                <div class="flex justify-between border-b border-slate-200 pb-1">
-                    <span>R$ 600.000 a R$ 1.200.000</span>
-                    <span class="font-bold">Progressivo</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Acima de R$ 1.200.000</span>
-                    <span class="font-bold">10%</span>
-                </div>
-            </div>
-        </section>
+        <!-- Seção de Parâmetros e Premissas -->
+        <div class="space-y-6">
+          <section class="p-5 bg-slate-100 border border-slate-200 rounded-xl">
+              <h3 class="text-[10px] font-bold uppercase text-slate-600 mb-2">Parâmetros de Alíquota</h3>
+              <div class="space-y-2 text-[11px] text-slate-600 leading-normal">
+                  <div class="flex justify-between border-b border-slate-200 pb-1">
+                      <span>Base até R$ 600.000</span>
+                      <span class="font-bold">0%</span>
+                  </div>
+                  <div class="flex justify-between border-b border-slate-200 pb-1">
+                      <span>R$ 600.000 a R$ 1.200.000</span>
+                      <span class="font-bold">Progressivo</span>
+                  </div>
+                  <div class="flex justify-between border-b border-slate-200 pb-1">
+                      <span>Acima de R$ 1.200.000</span>
+                      <span class="font-bold">10%</span>
+                  </div>
+                  <div class="flex justify-between pt-1">
+                      <span>Isenção Mensal Dividendos</span>
+                      <span class="font-bold">R$ 50.000</span>
+                  </div>
+              </div>
+          </section>
+
+          <section class="p-5 bg-white border border-slate-200 rounded-xl">
+              <h3 class="text-[10px] font-bold uppercase text-slate-400 mb-2">Premissas importantes</h3>
+              <p class="text-[11px] text-slate-500 leading-relaxed text-justify">
+                Dividendos distribuídos de forma uniforme ao longo dos meses, retenções na fonte conforme as regras vigentes, cálculo do ajuste apenas no âmbito do Imposto de Renda anual (DAA) e análise isolada do portfólio, sem considerar outras rendas, deduções ou particularidades fiscais individuais.
+              </p>
+          </section>
+        </div>
       </aside>
 
       <!-- Painel de Análise Líquida -->
@@ -162,12 +173,12 @@
         
         <div id="resultSummary" class="glass-card p-8 bg-slate-900 text-white flex flex-col md:flex-row justify-between items-center gap-6 shadow-xl">
             <div>
-                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Patrimônio Líquido Final Estimado</p>
-                <h2 id="bannerTitle" class="text-2xl font-black leading-tight uppercase">Analisando...</h2>
-                <p id="bannerSub" class="text-slate-400 text-sm mt-1 font-medium text-justify">Valor consolidado considerando capital, rendimentos e ajuste tributário.</p>
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Cenário com Maior Eficiência</p>
+                <h2 id="bannerTitle" class="text-2xl font-black leading-tight uppercase font-bold">Analisando...</h2>
+                <p id="bannerSub" class="text-slate-400 text-sm mt-1 font-medium text-justify font-normal">Projeção do patrimônio líquido final consolidado.</p>
             </div>
             <div class="text-center md:text-right border-l border-slate-800 pl-6">
-                <p class="text-[10px] font-bold text-slate-500 uppercase">Diferencial de Retorno</p>
+                <p class="text-[10px] font-bold text-slate-500 uppercase">Diferencial de Patrimônio</p>
                 <p id="bannerDiff" class="text-3xl font-black mono text-slate-100">R$ 0,00</p>
             </div>
         </div>
@@ -182,17 +193,10 @@
                 
                 <div class="space-y-4">
                     <div class="flex justify-between items-end">
-                        <span class="text-[11px] font-bold text-slate-400 uppercase">Saldo no Bolso</span>
+                        <span class="text-[11px] font-bold text-slate-400 uppercase">Patrimônio Líquido Final</span>
                         <span id="valCDB" class="text-xl font-black mono">R$ 0,00</span>
                     </div>
                     <div class="bar-container"><div id="barCDB" class="bar-fill bg-slate-900"></div></div>
-                    
-                    <div class="pt-4 border-t border-slate-100 space-y-2">
-                        <div class="flex justify-between text-xs">
-                            <span class="text-slate-500 font-bold uppercase">Saldo IRPF-M</span>
-                            <span id="ajusteCDB" class="font-black mono uppercase"></span>
-                        </div>
-                    </div>
                 </div>
             </section>
 
@@ -205,17 +209,10 @@
                 
                 <div class="space-y-4">
                     <div class="flex justify-between items-end">
-                        <span class="text-[11px] font-bold text-slate-400 uppercase">Saldo no Bolso</span>
+                        <span class="text-[11px] font-bold text-slate-400 uppercase">Patrimônio Líquido Final</span>
                         <span id="valLCA" class="text-xl font-black mono">R$ 0,00</span>
                     </div>
                     <div class="bar-container"><div id="barLCA" class="bar-fill bg-slate-400"></div></div>
-
-                    <div class="pt-4 border-t border-slate-100 space-y-2">
-                        <div class="flex justify-between text-xs">
-                            <span class="text-slate-500 font-bold uppercase">Saldo IRPF-M</span>
-                            <span id="ajusteLCA" class="font-black mono uppercase"></span>
-                        </div>
-                    </div>
                 </div>
             </section>
         </div>
@@ -243,8 +240,8 @@
   <script>
     const ALIQ_IR_CDB = 0.15;
     const ALIQ_IRRF_DIV = 0.10;
+    const ISENCAO_DIV_MENSAL = 50000;
     
-    // Regras Fixas
     const THRESHOLD_MIN = 600000;
     const THRESHOLD_MAX = 1200000;
 
@@ -276,41 +273,24 @@
       const irFonteProduto = isIsento ? 0 : (rendBruto * ALIQ_IR_CDB);
       const rendLiqProduto = rendBruto - irFonteProduto;
       
-      // NOVA REGRA: Se dividendos < 600.000, IR retido é zero
-      const irFonteDiv = dividendos < 600000 ? 0 : (dividendos * ALIQ_IRRF_DIV);
+      const mediaMensal = dividendos / 12;
+      const excedenteMensal = Math.max(0, mediaMensal - ISENCAO_DIV_MENSAL);
+      const irFonteDiv = excedenteMensal * ALIQ_IRRF_DIV * 12;
       const divLiq = dividendos - irFonteDiv;
 
-      // BASE DE CÁLCULO PARA IRPF-M
-      // Soma bruta: Rendimento Título (Bruto) + Dividendos (Bruto)
-      // Conforme histórico: Para LCA, lucro do título não compõe base
       const baseIrpfM = isIsento ? dividendos : (rendBruto + dividendos);
 
       const aliquotaEfetiva = calculateAliquot(baseIrpfM);
       const impostoDevidoTotal = baseIrpfM * aliquotaEfetiva;
       
       const totalIrRetido = irFonteProduto + irFonteDiv;
-      
-      // Saldo do IRPF-M: Retenções menos Devido
-      const saldoFinal = totalIrRetido - impostoDevidoTotal;
-      
-      // RESULTADO LÍQUIDO FINAL
-      // Patrimonio + Rendimento Líquido + Dividendos Líquidos + Saldo (Restituição ou A Pagar)
-      const noBolso = capital + rendLiqProduto + divLiq + saldoFinal;
+      const ajusteDAA = totalIrRetido - impostoDevidoTotal;
+      const patrimonioFinal = capital + rendLiqProduto + divLiq + ajusteDAA;
 
       return {
-        capital,
-        rendBruto, 
-        irFonteProduto, 
-        rendLiqProduto,
-        dividendos, 
-        irFonteDiv,
-        divLiq,
-        totalIrRetido,
-        baseIrpfM,
-        aliquotaEfetiva,
-        impostoDevidoTotal, 
-        saldoFinal, 
-        noBolso
+        capital, rendBruto, irFonteProduto, rendLiqProduto,
+        dividendos, irFonteDiv, divLiq, totalIrRetido,
+        baseIrpfM, aliquotaEfetiva, impostoDevidoTotal, ajusteDAA, patrimonioFinal
       };
     }
 
@@ -324,40 +304,31 @@
       const cdb = simulate(false, capital, dividendos, cdi, cdbPerc);
       const lca = simulate(true, capital, dividendos, cdi, lcaPerc);
 
-      const maxVal = Math.max(cdb.noBolso, lca.noBolso);
-      document.getElementById('valCDB').textContent = fmtBRL(cdb.noBolso);
-      document.getElementById('valLCA').textContent = fmtBRL(lca.noBolso);
-      document.getElementById('barCDB').style.width = (cdb.noBolso / maxVal * 100) + '%';
-      document.getElementById('barLCA').style.width = (lca.noBolso / maxVal * 100) + '%';
+      const maxVal = Math.max(cdb.patrimonioFinal, lca.patrimonioFinal);
+      document.getElementById('valCDB').textContent = fmtBRL(cdb.patrimonioFinal);
+      document.getElementById('valLCA').textContent = fmtBRL(lca.patrimonioFinal);
+      document.getElementById('barCDB').style.width = (cdb.patrimonioFinal / maxVal * 100) + '%';
+      document.getElementById('barLCA').style.width = (lca.patrimonioFinal / maxVal * 100) + '%';
 
-      const formatSaldoBanner = (val) => {
-          if (val < -0.01) return `<span class="text-slate-900 font-bold">A PAGAR: ${fmtBRL(Math.abs(val))}</span>`;
-          if (val > 0.01) return `<span class="text-slate-500 font-bold">RESTITUIR: ${fmtBRL(val)}</span>`;
-          return `<span class="text-slate-400 font-bold">ZERADO</span>`;
-      };
-
-      document.getElementById('ajusteCDB').innerHTML = formatSaldoBanner(cdb.saldoFinal);
-      document.getElementById('ajusteLCA').innerHTML = formatSaldoBanner(lca.saldoFinal);
-
-      const diff = Math.abs(cdb.noBolso - lca.noBolso);
-      const winner = cdb.noBolso > lca.noBolso ? 'Cenário CDB' : 'Cenário LCA/LCI';
+      const diff = Math.abs(cdb.patrimonioFinal - lca.patrimonioFinal);
+      const winner = cdb.patrimonioFinal > lca.patrimonioFinal ? 'Cenário CDB' : 'Cenário LCA/LCI';
       document.getElementById('bannerTitle').textContent = diff < 1 ? "Eficiência Idêntica" : `${winner} é superior`;
       document.getElementById('bannerDiff').textContent = fmtBRL(diff);
 
       const rows = [
-        ['Capital Investido', cdb.capital, lca.capital],
-        ['Rendimento do Título (Bruto)', cdb.rendBruto, lca.rendBruto],
-        ['IR Retido na Fonte (Resgate)', -cdb.irFonteProduto, -lca.irFonteProduto],
-        ['RENDIMENTO LÍQUIDO DO TÍTULO', cdb.rendLiqProduto, lca.rendLiqProduto, true],
-        ['Dividendos Recebidos (Bruto)', cdb.dividendos, lca.dividendos],
-        ['IR Retido sobre Dividendos', -cdb.irFonteDiv, -lca.irFonteDiv],
-        ['DIVIDENDOS LÍQUIDOS', cdb.divLiq, lca.divLiq, true],
-        ['TOTAL IR RETIDO NA FONTE', -cdb.totalIrRetido, -lca.totalIrRetido, false, true],
-        ['BASE DE CÁLCULO PARA IRPF-M', cdb.baseIrpfM, lca.baseIrpfM, false, false, true],
-        ['ALÍQUOTA IRPF-M APLICADA', fmtPct(cdb.aliquotaEfetiva), fmtPct(lca.aliquotaEfetiva), false, false, false, true],
-        ['IR MÍNIMO DEVIDO (BASE X ALÍQUOTA)', -cdb.impostoDevidoTotal, -lca.impostoDevidoTotal, false, true],
-        ['SALDO IRPF-M (RESTITUIÇÃO / A PAGAR)', cdb.saldoFinal, lca.saldoFinal, true, false, false, false, true],
-        ['RESULTADO LÍQUIDO FINAL', cdb.noBolso, lca.noBolso, true, false, false, false, false, true]
+        ['1. Capital investido', cdb.capital, lca.capital],
+        ['2. Rendimentos do investimento (bruto)', cdb.rendBruto, lca.rendBruto],
+        ['3. Imposto retido automaticamente no investimento', -cdb.irFonteProduto, -lca.irFonteProduto, false, true],
+        ['4. Rendimentos líquidos do investimento', cdb.rendLiqProduto, lca.rendLiqProduto, true],
+        ['5. Dividendos recebidos no ano', cdb.dividendos, lca.dividendos],
+        ['6. Imposto retido sobre dividendos (regra mensal acima de R$ 50 mil)', -cdb.irFonteDiv, -lca.irFonteDiv, false, true],
+        ['7. Dividendos líquidos recebidos', cdb.divLiq, lca.divLiq, true],
+        ['8. Renda total considerada pela regra de imposto mínimo (IRPF-M)', cdb.baseIrpfM, lca.baseIrpfM, false, false, true],
+        ['9. Alíquota mínima aplicável', fmtPct(cdb.aliquotaEfetiva), fmtPct(lca.aliquotaEfetiva), false, false, false, true],
+        ['10. Imposto mínimo teórico sobre a renda', -cdb.impostoDevidoTotal, -lca.impostoDevidoTotal, false, true],
+        ['11. Impostos já pagos ao longo do ano (investimentos + dividendos)', -cdb.totalIrRetido, -lca.totalIrRetido, false, true],
+        ['12. Ajuste final no Imposto de Renda na DAA', cdb.ajusteDAA, lca.ajusteDAA, true, false, false, false, true],
+        ['13. Patrimônio líquido final do investidor', cdb.patrimonioFinal, lca.patrimonioFinal, true, false, false, false, false, true]
       ];
 
       document.getElementById('auditTable').innerHTML = rows.map(r => {
@@ -367,7 +338,7 @@
         if (r[3]) bgClass = "bg-slate-50";
         if (r[4]) textClass = "text-red-500 font-bold";
         if (r[5]) { bgClass = "bg-slate-100 font-black"; textClass = "text-slate-900"; }
-        if (r[6]) { textClass = "text-slate-900 font-black"; }
+        if (r[6]) textClass = "text-slate-900 font-black";
         if (r[7]) {
             bgClass = "bg-slate-50";
             textClass = r[1] > 0 ? "text-slate-600 font-black" : "text-slate-900 font-black";
